@@ -1,0 +1,97 @@
+<html>
+    <head>
+        <script>
+            /*
+            Upload URL für Dateiname von Server abrufen
+            */
+            function getUploadURL() {
+            var file = document.getElementById("movieupload_files").files[0];
+            
+            /* API-Key des Projekts zur Verifikation */
+            var json = {
+                apikey: "{API-Key}",
+                file: file.name
+            }
+            
+            var xhr = new XMLHttpRequest();
+            /* ProjektID in URL zur Verifikation */
+            xhr.open('POST', 'https://api.acs-solution.de/selfvod/{ProjektID}/getuploadurl', true);
+            xhr.setRequestHeader('Content-type','application/json; charset=utf-8');
+            xhr.onload = function () {
+                var ret = JSON.parse(xhr.responseText);
+                if(ret.uploadUrl)
+                UploadFile(ret.uploadUrl);
+                else
+                errorHandler();
+            }
+            xhr.send(JSON.stringify(json));
+            }
+
+            /*
+            Upload der Datei zu Upload URL
+            */
+            function UploadFile(uploadUrl) {
+            console.log(uploadUrl);
+            
+            var file = document.getElementById("movieupload_files").files[0];
+            var formdata = new FormData();
+            formdata.append("file1", file);
+            
+            var xhr = new XMLHttpRequest();
+            xhr.upload.addEventListener("progress", progressHandler, false);
+            xhr.addEventListener("load", completeHandler, false);
+            xhr.addEventListener("error", errorHandler, false);
+            xhr.addEventListener("abort", abortHandler, false);
+            
+            console.log(formdata);
+            
+            xhr.open("PUT", uploadUrl);
+            xhr.send(formdata);
+            }
+
+            /* 
+            Grafische Darstellung des Upload Fortschritts
+            */
+            function progressHandler(event) {
+            document.getElementById("movieupload_loaded_n_total").innerHTML = "Uploaded " + niceBytes(event.loaded) + " of " + niceBytes(event.total);
+            var percent = (event.loaded / event.total) * 100;
+            document.getElementById("movieupload_progressBar").value = Math.round(percent);
+            document.getElementById("movieupload_status").innerHTML = Math.round(percent) + "% uploaded... please wait";
+            }
+
+            function completeHandler(event) {
+            document.getElementById("movieupload_status").innerHTML = event.target.responseText;
+            document.getElementById("movieupload_progressBar").value = 0;
+            }
+
+            function errorHandler(event) {
+            document.getElementById("movieupload_status").innerHTML = "Upload Failed";
+            }
+
+            function abortHandler(event) {
+            document.getElementById("movieupload_status").innerHTML = "Upload Aborted";
+            }
+
+            /* 
+            Bessere Darstellung von Dateigrößen
+            */
+            function niceBytes(x) {
+            const units = ['bytes', 'KB', 'MB', 'GB', 'TB', 'PB'];
+            var l = 0, n = parseInt(x, 10) || 0;
+            while(n >= 1024 && ++l) {
+                n = n/1024;
+            }
+            return(n.toFixed(n < 10 && l > 0 ? 1 : 0) + ' ' + units[l]);
+            }
+        </script>
+    </head>
+    
+    <body>
+        <form id="movieupload_upload_form">
+            <input type="file" name="movieupload_files" id="movieupload_files" onchange="getUploadURL()" style="width:300px;"><br>
+            <progress id="movieupload_progressBar" value="0" max="100" style="width:300px;"></progress>
+            <h3 id="movieupload_status"></h3>
+            <p id="movieupload_loaded_n_total"></p>
+        </form>
+    </body>
+</html>
