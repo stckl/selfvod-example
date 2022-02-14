@@ -1,0 +1,33 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>A Basic Responsive 16:9 IFrame Example</title>
+
+  <style>
+    .fluidMedia {
+        position: relative;
+        padding-bottom: 56.25%; /* proportion value to aspect ratio 16:9 (9 / 16 = 0.5625 or 56.25%) */
+        height: 0;
+        overflow: hidden;
+    }
+
+    .fluidMedia iframe {
+        position: absolute;
+        top: 0; 
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
+  </style>
+</head>
+
+<body>
+    <div class="fluidMedia">
+        <iframe src="https://selfvod.streaming-solution.de/public/123456/5109335b-706c-4724-b18c-244c7e476fe4/iframe.html" frameborder="0"> </iframe>
+    </div>
+</body>
+</html>
